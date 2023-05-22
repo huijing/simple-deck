@@ -1,84 +1,56 @@
 "use strict";
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-var slideCount = document.querySelectorAll('section').length;
-
-var controls = function controls(event) {
-  var isCover = window.location.hash === '' || window.location.hash === '#start';
-
+const slideCount = document.querySelectorAll('section').length;
+const controls = event => {
+  const isCover = window.location.hash === '' || window.location.hash === '#start';
   if (isCover) {
     start(event);
   } else {
     navigate(event);
   }
 };
-
-var start = function start(event) {
+const start = event => {
   if (event.code === 'Space' || event.code === 'ArrowRight' || event.code === 'Period') {
     window.location.hash = '#slide1';
   }
 };
-
-var navigate = function navigate(event) {
-  var isFirstSlide = window.location.hash === '#slide1';
-  var isLastSlide = window.location.hash === '#slide' + (slideCount - 1);
-  var activeSlide = document.querySelector('[id^="slide"]:target');
-  var slideNum = parseInt(activeSlide.getAttribute('id').substring(5));
-
+const navigate = event => {
+  const isFirstSlide = window.location.hash === '#slide1';
+  const isLastSlide = window.location.hash === '#slide' + (slideCount - 1);
+  const activeSlide = document.querySelector('[id^="slide"]:target');
+  const slideNum = parseInt(activeSlide.getAttribute('id').substring(5));
   if (activeSlide && !isLastSlide && (event.code === 'Space' || event.code === 'ArrowRight' || event.code === 'PageDown')) {
     window.location.hash = 'slide' + (slideNum + 1);
   }
-
   if (!isFirstSlide && (event.code === 'ArrowLeft' || event.code === 'PageUp')) {
     window.location.hash = 'slide' + (slideNum - 1);
   }
-
   if (isLastSlide && event.code === 'KeyR') {
     window.location.hash = '#start';
   }
-
   if (activeSlide && event.code === 'Period') {
-    var winHash = window.location.hash;
-    var activeList = document.querySelector(winHash + ' .revealable');
-
+    const winHash = window.location.hash;
+    const activeList = document.querySelector(winHash + ' .revealable');
     if (activeList) {
-      var listArray = _toConsumableArray(document.querySelectorAll(winHash + ' .revealable .fragment'));
-
+      const listArray = [...document.querySelectorAll(winHash + ' .revealable .fragment')];
       if (listArray[0]) {
         listArray[0].classList.remove('fragment');
       }
     }
   }
-
   if (activeSlide && event.code === 'Comma') {
-    var _winHash = window.location.hash;
-
-    var _activeList = document.querySelector(_winHash + ' .revealable');
-
-    if (_activeList) {
-      var _listArray = _toConsumableArray(document.querySelectorAll(_winHash + ' .revealable li'));
-
-      var hideList = _listArray.forEach(function (list) {
+    const winHash = window.location.hash;
+    const activeList = document.querySelector(winHash + ' .revealable');
+    if (activeList) {
+      const listArray = [...document.querySelectorAll(winHash + ' .revealable li')];
+      const hideList = listArray.forEach(list => {
         list.classList.add('fragment');
       });
-
       return hideList;
     }
   }
 };
-
-var launchFullscreen = function launchFullscreen(element) {
+const launchFullscreen = element => {
   if (element.requestFullscreen) {
     element.requestFullscreen();
   } else if (element.mozRequestFullScreen) {
@@ -89,27 +61,23 @@ var launchFullscreen = function launchFullscreen(element) {
     element.msRequestFullscreen();
   }
 };
-
-var toggleFullScreen = function toggleFullScreen(event) {
+const toggleFullScreen = event => {
   if (event.code === 'KeyF') {
     launchFullscreen(document.documentElement);
   }
 };
-
 document.body.addEventListener('keydown', controls, false);
 document.addEventListener('keydown', toggleFullScreen, false);
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-var gamepadConnected = ('ongamepadconnected' in window);
-var controllers = {};
-var gamepadLand;
-var buttonsCache = [];
-var buttonsStatus = []; // Mapping is subject to change
+let gamepadConnected = ('ongamepadconnected' in window);
+let controllers = {};
+let gamepadLand;
+let buttonsCache = [];
+let buttonsStatus = [];
+// Mapping is subject to change
 // Turn on debugger function to check
-
-var leftJoyConMapping = {
+const leftJoyConMapping = {
   0: 'Left',
   1: 'Down',
   2: 'Up',
@@ -122,15 +90,12 @@ var leftJoyConMapping = {
   14: 'L',
   15: 'ZL'
 };
-
 if (!gamepadConnected) {
   setInterval(pollGamepads, 500);
 }
-
-var pollGamepads = function pollGamepads() {
-  var gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : [];
-
-  for (var i = 0; i < gamepads.length; i++) {
+const pollGamepads = () => {
+  const gamepads = navigator.getGamepads ? navigator.getGamepads() : navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : [];
+  for (let i = 0; i < gamepads.length; i++) {
     if (gamepads[i]) {
       if (gamepads[i].index in controllers) {
         controllers[gamepads[i].index] = gamepads[i];
@@ -140,80 +105,64 @@ var pollGamepads = function pollGamepads() {
     }
   }
 };
-
-var addGamepad = function addGamepad(gamepad) {
+const addGamepad = gamepad => {
   console.log(gamepad);
   window.location.hash = '#start';
   controllers[gamepad.index] = gamepad;
-  var d = document.createElement('aside');
+  const d = document.createElement('aside');
   d.className = 'controllers';
-  var p = document.createElement('span');
+  const p = document.createElement('span');
   p.innerHTML = '🕹';
   p.setAttribute('id', 'controller' + gamepad.index);
   d.appendChild(p);
   document.body.appendChild(d);
   gamepadLand = requestAnimationFrame(updateStatus);
 };
-
-var updateStatus = function updateStatus() {
+const updateStatus = () => {
   if (!gamepadConnected) {
     pollGamepads();
   }
-
-  for (var j in controllers) {
-    var controller = controllers[j];
-    var buttonsArray = controller.buttons;
-
-    for (var i = 0; i < buttonsArray.length; i++) {
+  for (let j in controllers) {
+    const controller = controllers[j];
+    const buttonsArray = controller.buttons;
+    for (let i = 0; i < buttonsArray.length; i++) {
       if (buttonPressed(buttonsArray[i])) {
         mappingDebugger(i);
-        var isCover = window.location.hash === '' || window.location.hash === '#start';
-        var isFirstSlide = window.location.hash === '#slide1';
-        var isLastSlide = window.location.hash === '#slide' + (slideCount - 1);
-
+        const isCover = window.location.hash === '' || window.location.hash === '#start';
+        const isFirstSlide = window.location.hash === '#slide1';
+        const isLastSlide = window.location.hash === '#slide' + (slideCount - 1);
         if (isCover) {
           window.location.hash = '#slide1';
         } else {
-          var activeSlide = document.querySelector('[id^="slide"]:target');
-          var slideNum = parseInt(activeSlide.getAttribute('id').substring(5));
-
+          const activeSlide = document.querySelector('[id^="slide"]:target');
+          const slideNum = parseInt(activeSlide.getAttribute('id').substring(5));
           switch (leftJoyConMapping[i]) {
             case 'Left':
               if (!isFirstSlide) {
                 window.location.hash = 'slide' + (slideNum - 1);
               }
-
               break;
-
             case 'Right':
               if (activeSlide && !isLastSlide) {
                 console.log(slideNum);
                 window.location.hash = 'slide' + (slideNum + 1);
               }
-
               break;
-
             case 'Up':
               break;
-
             case 'Down':
               break;
-
             case 'Minus':
               if (isLastSlide) {
                 window.location.hash = '#slide1';
               }
-
               break;
-
             case 'L':
               launchFullscreen(document.documentElement);
               break;
-
             case 'ZL':
               exitFullscreen();
               break;
-
             default:
               console.log('The mapping is probably off. Turn on debugger to check. ¯\\\_(ツ)_/¯');
           }
@@ -221,40 +170,30 @@ var updateStatus = function updateStatus() {
       }
     }
   }
-
-  gamepadLand = setTimeout(function () {
-    return requestAnimationFrame(updateStatus);
-  }, 200);
+  gamepadLand = setTimeout(() => requestAnimationFrame(updateStatus), 200);
 };
-
-var buttonPressed = function buttonPressed(key) {
-  if (_typeof(key) == 'object') {
+const buttonPressed = key => {
+  if (typeof key == 'object') {
     return key.pressed;
   }
-
   return false;
 };
-
-var mappingDebugger = function mappingDebugger(index) {
+const mappingDebugger = index => {
   console.log('Did you press ' + leftJoyConMapping[index] + '? If you see "Undefined", the mapping is off. Index position of pressed button is ' + index);
 };
-
-var connectHandler = function connectHandler(event) {
+const connectHandler = event => {
   addGamepad(event.gamepad);
 };
-
-var disconnectHandler = function disconnectHandler(event) {
+const disconnectHandler = event => {
   removeGamepad(event.gamepad);
 };
-
-var removeGamepad = function removeGamepad(gamepad) {
-  var d = document.getElementById('controller' + gamepad.index);
+const removeGamepad = gamepad => {
+  const d = document.getElementById('controller' + gamepad.index);
   document.body.removeChild(d);
   delete controllers[gamepad.index];
   cancelAnimationFrame(gamepadLand);
 };
-
-var exitFullscreen = function exitFullscreen() {
+const exitFullscreen = () => {
   if (document.exitFullscreen) {
     document.exitFullscreen();
   } else if (document.mozCancelFullScreen) {
@@ -263,7 +202,6 @@ var exitFullscreen = function exitFullscreen() {
     document.webkitExitFullscreen();
   }
 };
-
 window.addEventListener("gamepadconnected", connectHandler);
 window.addEventListener("gamepaddisconnected", disconnectHandler);
 "use strict";
@@ -271,366 +209,286 @@ window.addEventListener("gamepaddisconnected", disconnectHandler);
 /* PrismJS 1.20.0
 https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript */
 var _self = "undefined" != typeof window ? window : "undefined" != typeof WorkerGlobalScope && self instanceof WorkerGlobalScope ? self : {},
-    Prism = function (u) {
-  var c = /\blang(?:uage)?-([\w-]+)\b/i,
+  Prism = function (u) {
+    var c = /\blang(?:uage)?-([\w-]+)\b/i,
       n = 0,
       C = {
-    manual: u.Prism && u.Prism.manual,
-    disableWorkerMessageHandler: u.Prism && u.Prism.disableWorkerMessageHandler,
-    util: {
-      encode: function e(n) {
-        return n instanceof _ ? new _(n.type, e(n.content), n.alias) : Array.isArray(n) ? n.map(e) : n.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
-      },
-      type: function type(e) {
-        return Object.prototype.toString.call(e).slice(8, -1);
-      },
-      objId: function objId(e) {
-        return e.__id || Object.defineProperty(e, "__id", {
-          value: ++n
-        }), e.__id;
-      },
-      clone: function t(e, r) {
-        var a,
-            n,
-            l = C.util.type(e);
-
-        switch (r = r || {}, l) {
-          case "Object":
-            if (n = C.util.objId(e), r[n]) return r[n];
-
-            for (var i in a = {}, r[n] = a, e) {
-              e.hasOwnProperty(i) && (a[i] = t(e[i], r));
+        manual: u.Prism && u.Prism.manual,
+        disableWorkerMessageHandler: u.Prism && u.Prism.disableWorkerMessageHandler,
+        util: {
+          encode: function e(n) {
+            return n instanceof _ ? new _(n.type, e(n.content), n.alias) : Array.isArray(n) ? n.map(e) : n.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/\u00a0/g, " ");
+          },
+          type: function (e) {
+            return Object.prototype.toString.call(e).slice(8, -1);
+          },
+          objId: function (e) {
+            return e.__id || Object.defineProperty(e, "__id", {
+              value: ++n
+            }), e.__id;
+          },
+          clone: function t(e, r) {
+            var a,
+              n,
+              l = C.util.type(e);
+            switch (r = r || {}, l) {
+              case "Object":
+                if (n = C.util.objId(e), r[n]) return r[n];
+                for (var i in a = {}, r[n] = a, e) e.hasOwnProperty(i) && (a[i] = t(e[i], r));
+                return a;
+              case "Array":
+                return n = C.util.objId(e), r[n] ? r[n] : (a = [], r[n] = a, e.forEach(function (e, n) {
+                  a[n] = t(e, r);
+                }), a);
+              default:
+                return e;
             }
-
-            return a;
-
-          case "Array":
-            return n = C.util.objId(e), r[n] ? r[n] : (a = [], r[n] = a, e.forEach(function (e, n) {
-              a[n] = t(e, r);
-            }), a);
-
-          default:
-            return e;
-        }
-      },
-      getLanguage: function getLanguage(e) {
-        for (; e && !c.test(e.className);) {
-          e = e.parentElement;
-        }
-
-        return e ? (e.className.match(c) || [, "none"])[1].toLowerCase() : "none";
-      },
-      currentScript: function currentScript() {
-        if ("undefined" == typeof document) return null;
-        if ("currentScript" in document) return document.currentScript;
-
-        try {
-          throw new Error();
-        } catch (e) {
-          var n = (/at [^(\r\n]*\((.*):.+:.+\)$/i.exec(e.stack) || [])[1];
-
-          if (n) {
-            var t = document.getElementsByTagName("script");
-
-            for (var r in t) {
-              if (t[r].src == n) return t[r];
+          },
+          getLanguage: function (e) {
+            for (; e && !c.test(e.className);) e = e.parentElement;
+            return e ? (e.className.match(c) || [, "none"])[1].toLowerCase() : "none";
+          },
+          currentScript: function () {
+            if ("undefined" == typeof document) return null;
+            if ("currentScript" in document) return document.currentScript;
+            try {
+              throw new Error();
+            } catch (e) {
+              var n = (/at [^(\r\n]*\((.*):.+:.+\)$/i.exec(e.stack) || [])[1];
+              if (n) {
+                var t = document.getElementsByTagName("script");
+                for (var r in t) if (t[r].src == n) return t[r];
+              }
+              return null;
             }
           }
-
-          return null;
-        }
-      }
-    },
-    languages: {
-      extend: function extend(e, n) {
-        var t = C.util.clone(C.languages[e]);
-
-        for (var r in n) {
-          t[r] = n[r];
-        }
-
-        return t;
-      },
-      insertBefore: function insertBefore(t, e, n, r) {
-        var a = (r = r || C.languages)[t],
-            l = {};
-
-        for (var i in a) {
-          if (a.hasOwnProperty(i)) {
-            if (i == e) for (var o in n) {
-              n.hasOwnProperty(o) && (l[o] = n[o]);
+        },
+        languages: {
+          extend: function (e, n) {
+            var t = C.util.clone(C.languages[e]);
+            for (var r in n) t[r] = n[r];
+            return t;
+          },
+          insertBefore: function (t, e, n, r) {
+            var a = (r = r || C.languages)[t],
+              l = {};
+            for (var i in a) if (a.hasOwnProperty(i)) {
+              if (i == e) for (var o in n) n.hasOwnProperty(o) && (l[o] = n[o]);
+              n.hasOwnProperty(i) || (l[i] = a[i]);
             }
-            n.hasOwnProperty(i) || (l[i] = a[i]);
-          }
-        }
-
-        var s = r[t];
-        return r[t] = l, C.languages.DFS(C.languages, function (e, n) {
-          n === s && e != t && (this[e] = l);
-        }), l;
-      },
-      DFS: function e(n, t, r, a) {
-        a = a || {};
-        var l = C.util.objId;
-
-        for (var i in n) {
-          if (n.hasOwnProperty(i)) {
-            t.call(n, i, n[i], r || i);
-            var o = n[i],
+            var s = r[t];
+            return r[t] = l, C.languages.DFS(C.languages, function (e, n) {
+              n === s && e != t && (this[e] = l);
+            }), l;
+          },
+          DFS: function e(n, t, r, a) {
+            a = a || {};
+            var l = C.util.objId;
+            for (var i in n) if (n.hasOwnProperty(i)) {
+              t.call(n, i, n[i], r || i);
+              var o = n[i],
                 s = C.util.type(o);
-            "Object" !== s || a[l(o)] ? "Array" !== s || a[l(o)] || (a[l(o)] = !0, e(o, t, i, a)) : (a[l(o)] = !0, e(o, t, null, a));
+              "Object" !== s || a[l(o)] ? "Array" !== s || a[l(o)] || (a[l(o)] = !0, e(o, t, i, a)) : (a[l(o)] = !0, e(o, t, null, a));
+            }
           }
-        }
-      }
-    },
-    plugins: {},
-    highlightAll: function highlightAll(e, n) {
-      C.highlightAllUnder(document, e, n);
-    },
-    highlightAllUnder: function highlightAllUnder(e, n, t) {
-      var r = {
-        callback: t,
-        container: e,
-        selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
-      };
-      C.hooks.run("before-highlightall", r), r.elements = Array.prototype.slice.apply(r.container.querySelectorAll(r.selector)), C.hooks.run("before-all-elements-highlight", r);
-
-      for (var a, l = 0; a = r.elements[l++];) {
-        C.highlightElement(a, !0 === n, r.callback);
-      }
-    },
-    highlightElement: function highlightElement(e, n, t) {
-      var r = C.util.getLanguage(e),
-          a = C.languages[r];
-      e.className = e.className.replace(c, "").replace(/\s+/g, " ") + " language-" + r;
-      var l = e.parentNode;
-      l && "pre" === l.nodeName.toLowerCase() && (l.className = l.className.replace(c, "").replace(/\s+/g, " ") + " language-" + r);
-      var i = {
-        element: e,
-        language: r,
-        grammar: a,
-        code: e.textContent
-      };
-
-      function o(e) {
-        i.highlightedCode = e, C.hooks.run("before-insert", i), i.element.innerHTML = i.highlightedCode, C.hooks.run("after-highlight", i), C.hooks.run("complete", i), t && t.call(i.element);
-      }
-
-      if (C.hooks.run("before-sanity-check", i), !i.code) return C.hooks.run("complete", i), void (t && t.call(i.element));
-      if (C.hooks.run("before-highlight", i), i.grammar) {
-        if (n && u.Worker) {
-          var s = new Worker(C.filename);
-          s.onmessage = function (e) {
-            o(e.data);
-          }, s.postMessage(JSON.stringify({
-            language: i.language,
-            code: i.code,
-            immediateClose: !0
-          }));
-        } else o(C.highlight(i.code, i.grammar, i.language));
-      } else o(C.util.encode(i.code));
-    },
-    highlight: function highlight(e, n, t) {
-      var r = {
-        code: e,
-        grammar: n,
-        language: t
-      };
-      return C.hooks.run("before-tokenize", r), r.tokens = C.tokenize(r.code, r.grammar), C.hooks.run("after-tokenize", r), _.stringify(C.util.encode(r.tokens), r.language);
-    },
-    tokenize: function tokenize(e, n) {
-      var t = n.rest;
-
-      if (t) {
-        for (var r in t) {
-          n[r] = t[r];
-        }
-
-        delete n.rest;
-      }
-
-      var a = new l();
-      return M(a, a.head, e), function e(n, t, r, a, l, i, o) {
-        for (var s in r) {
-          if (r.hasOwnProperty(s) && r[s]) {
-            var u = r[s];
-            u = Array.isArray(u) ? u : [u];
-
-            for (var c = 0; c < u.length; ++c) {
-              if (o && o == s + "," + c) return;
-              var g = u[c],
+        },
+        plugins: {},
+        highlightAll: function (e, n) {
+          C.highlightAllUnder(document, e, n);
+        },
+        highlightAllUnder: function (e, n, t) {
+          var r = {
+            callback: t,
+            container: e,
+            selector: 'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'
+          };
+          C.hooks.run("before-highlightall", r), r.elements = Array.prototype.slice.apply(r.container.querySelectorAll(r.selector)), C.hooks.run("before-all-elements-highlight", r);
+          for (var a, l = 0; a = r.elements[l++];) C.highlightElement(a, !0 === n, r.callback);
+        },
+        highlightElement: function (e, n, t) {
+          var r = C.util.getLanguage(e),
+            a = C.languages[r];
+          e.className = e.className.replace(c, "").replace(/\s+/g, " ") + " language-" + r;
+          var l = e.parentNode;
+          l && "pre" === l.nodeName.toLowerCase() && (l.className = l.className.replace(c, "").replace(/\s+/g, " ") + " language-" + r);
+          var i = {
+            element: e,
+            language: r,
+            grammar: a,
+            code: e.textContent
+          };
+          function o(e) {
+            i.highlightedCode = e, C.hooks.run("before-insert", i), i.element.innerHTML = i.highlightedCode, C.hooks.run("after-highlight", i), C.hooks.run("complete", i), t && t.call(i.element);
+          }
+          if (C.hooks.run("before-sanity-check", i), !i.code) return C.hooks.run("complete", i), void (t && t.call(i.element));
+          if (C.hooks.run("before-highlight", i), i.grammar) {
+            if (n && u.Worker) {
+              var s = new Worker(C.filename);
+              s.onmessage = function (e) {
+                o(e.data);
+              }, s.postMessage(JSON.stringify({
+                language: i.language,
+                code: i.code,
+                immediateClose: !0
+              }));
+            } else o(C.highlight(i.code, i.grammar, i.language));
+          } else o(C.util.encode(i.code));
+        },
+        highlight: function (e, n, t) {
+          var r = {
+            code: e,
+            grammar: n,
+            language: t
+          };
+          return C.hooks.run("before-tokenize", r), r.tokens = C.tokenize(r.code, r.grammar), C.hooks.run("after-tokenize", r), _.stringify(C.util.encode(r.tokens), r.language);
+        },
+        tokenize: function (e, n) {
+          var t = n.rest;
+          if (t) {
+            for (var r in t) n[r] = t[r];
+            delete n.rest;
+          }
+          var a = new l();
+          return M(a, a.head, e), function e(n, t, r, a, l, i, o) {
+            for (var s in r) if (r.hasOwnProperty(s) && r[s]) {
+              var u = r[s];
+              u = Array.isArray(u) ? u : [u];
+              for (var c = 0; c < u.length; ++c) {
+                if (o && o == s + "," + c) return;
+                var g = u[c],
                   f = g.inside,
                   h = !!g.lookbehind,
                   d = !!g.greedy,
                   v = 0,
                   p = g.alias;
-
-              if (d && !g.pattern.global) {
-                var m = g.pattern.toString().match(/[imsuy]*$/)[0];
-                g.pattern = RegExp(g.pattern.source, m + "g");
-              }
-
-              g = g.pattern || g;
-
-              for (var y = a.next, k = l; y !== t.tail; k += y.value.length, y = y.next) {
-                var b = y.value;
-                if (t.length > n.length) return;
-
-                if (!(b instanceof _)) {
-                  var x = 1;
-
-                  if (d && y != t.tail.prev) {
-                    g.lastIndex = k;
-                    var w = g.exec(n);
-                    if (!w) break;
-                    var A = w.index + (h && w[1] ? w[1].length : 0),
+                if (d && !g.pattern.global) {
+                  var m = g.pattern.toString().match(/[imsuy]*$/)[0];
+                  g.pattern = RegExp(g.pattern.source, m + "g");
+                }
+                g = g.pattern || g;
+                for (var y = a.next, k = l; y !== t.tail; k += y.value.length, y = y.next) {
+                  var b = y.value;
+                  if (t.length > n.length) return;
+                  if (!(b instanceof _)) {
+                    var x = 1;
+                    if (d && y != t.tail.prev) {
+                      g.lastIndex = k;
+                      var w = g.exec(n);
+                      if (!w) break;
+                      var A = w.index + (h && w[1] ? w[1].length : 0),
                         P = w.index + w[0].length,
                         S = k;
-
-                    for (S += y.value.length; S <= A;) {
-                      y = y.next, S += y.value.length;
+                      for (S += y.value.length; S <= A;) y = y.next, S += y.value.length;
+                      if (S -= y.value.length, k = S, y.value instanceof _) continue;
+                      for (var O = y; O !== t.tail && (S < P || "string" == typeof O.value && !O.prev.value.greedy); O = O.next) x++, S += O.value.length;
+                      x--, b = n.slice(k, S), w.index -= k;
+                    } else {
+                      g.lastIndex = 0;
+                      var w = g.exec(b);
                     }
-
-                    if (S -= y.value.length, k = S, y.value instanceof _) continue;
-
-                    for (var O = y; O !== t.tail && (S < P || "string" == typeof O.value && !O.prev.value.greedy); O = O.next) {
-                      x++, S += O.value.length;
-                    }
-
-                    x--, b = n.slice(k, S), w.index -= k;
-                  } else {
-                    g.lastIndex = 0;
-                    var w = g.exec(b);
-                  }
-
-                  if (w) {
-                    h && (v = w[1] ? w[1].length : 0);
-                    var A = w.index + v,
+                    if (w) {
+                      h && (v = w[1] ? w[1].length : 0);
+                      var A = w.index + v,
                         w = w[0].slice(v),
                         P = A + w.length,
                         E = b.slice(0, A),
                         N = b.slice(P),
                         j = y.prev;
-                    E && (j = M(t, j, E), k += E.length), W(t, j, x);
-                    var L = new _(s, f ? C.tokenize(w, f) : w, p, w, d);
-                    if (y = M(t, j, L), N && M(t, y, N), 1 < x && e(n, t, r, y.prev, k, !0, s + "," + c), i) break;
-                  } else if (i) break;
+                      E && (j = M(t, j, E), k += E.length), W(t, j, x);
+                      var L = new _(s, f ? C.tokenize(w, f) : w, p, w, d);
+                      if (y = M(t, j, L), N && M(t, y, N), 1 < x && e(n, t, r, y.prev, k, !0, s + "," + c), i) break;
+                    } else if (i) break;
+                  }
                 }
               }
             }
+          }(e, a, n, a.head, 0), function (e) {
+            var n = [],
+              t = e.head.next;
+            for (; t !== e.tail;) n.push(t.value), t = t.next;
+            return n;
+          }(a);
+        },
+        hooks: {
+          all: {},
+          add: function (e, n) {
+            var t = C.hooks.all;
+            t[e] = t[e] || [], t[e].push(n);
+          },
+          run: function (e, n) {
+            var t = C.hooks.all[e];
+            if (t && t.length) for (var r, a = 0; r = t[a++];) r(n);
           }
-        }
-      }(e, a, n, a.head, 0), function (e) {
-        var n = [],
-            t = e.head.next;
-
-        for (; t !== e.tail;) {
-          n.push(t.value), t = t.next;
-        }
-
-        return n;
-      }(a);
-    },
-    hooks: {
-      all: {},
-      add: function add(e, n) {
-        var t = C.hooks.all;
-        t[e] = t[e] || [], t[e].push(n);
-      },
-      run: function run(e, n) {
-        var t = C.hooks.all[e];
-        if (t && t.length) for (var r, a = 0; r = t[a++];) {
-          r(n);
-        }
-      }
-    },
-    Token: _
-  };
-
-  function _(e, n, t, r, a) {
-    this.type = e, this.content = n, this.alias = t, this.length = 0 | (r || "").length, this.greedy = !!a;
-  }
-
-  function l() {
-    var e = {
-      value: null,
-      prev: null,
-      next: null
-    },
+        },
+        Token: _
+      };
+    function _(e, n, t, r, a) {
+      this.type = e, this.content = n, this.alias = t, this.length = 0 | (r || "").length, this.greedy = !!a;
+    }
+    function l() {
+      var e = {
+          value: null,
+          prev: null,
+          next: null
+        },
         n = {
-      value: null,
-      prev: e,
-      next: null
-    };
-    e.next = n, this.head = e, this.tail = n, this.length = 0;
-  }
-
-  function M(e, n, t) {
-    var r = n.next,
+          value: null,
+          prev: e,
+          next: null
+        };
+      e.next = n, this.head = e, this.tail = n, this.length = 0;
+    }
+    function M(e, n, t) {
+      var r = n.next,
         a = {
-      value: t,
-      prev: n,
-      next: r
-    };
-    return n.next = a, r.prev = a, e.length++, a;
-  }
-
-  function W(e, n, t) {
-    for (var r = n.next, a = 0; a < t && r !== e.tail; a++) {
-      r = r.next;
+          value: t,
+          prev: n,
+          next: r
+        };
+      return n.next = a, r.prev = a, e.length++, a;
     }
-
-    (n.next = r).prev = n, e.length -= a;
-  }
-
-  if (u.Prism = C, _.stringify = function n(e, t) {
-    if ("string" == typeof e) return e;
-
-    if (Array.isArray(e)) {
-      var r = "";
-      return e.forEach(function (e) {
-        r += n(e, t);
-      }), r;
+    function W(e, n, t) {
+      for (var r = n.next, a = 0; a < t && r !== e.tail; a++) r = r.next;
+      (n.next = r).prev = n, e.length -= a;
     }
-
-    var a = {
-      type: e.type,
-      content: n(e.content, t),
-      tag: "span",
-      classes: ["token", e.type],
-      attributes: {},
-      language: t
-    },
+    if (u.Prism = C, _.stringify = function n(e, t) {
+      if ("string" == typeof e) return e;
+      if (Array.isArray(e)) {
+        var r = "";
+        return e.forEach(function (e) {
+          r += n(e, t);
+        }), r;
+      }
+      var a = {
+          type: e.type,
+          content: n(e.content, t),
+          tag: "span",
+          classes: ["token", e.type],
+          attributes: {},
+          language: t
+        },
         l = e.alias;
-    l && (Array.isArray(l) ? Array.prototype.push.apply(a.classes, l) : a.classes.push(l)), C.hooks.run("wrap", a);
-    var i = "";
-
-    for (var o in a.attributes) {
-      i += " " + o + '="' + (a.attributes[o] || "").replace(/"/g, "&quot;") + '"';
-    }
-
-    return "<" + a.tag + ' class="' + a.classes.join(" ") + '"' + i + ">" + a.content + "</" + a.tag + ">";
-  }, !u.document) return u.addEventListener && (C.disableWorkerMessageHandler || u.addEventListener("message", function (e) {
-    var n = JSON.parse(e.data),
+      l && (Array.isArray(l) ? Array.prototype.push.apply(a.classes, l) : a.classes.push(l)), C.hooks.run("wrap", a);
+      var i = "";
+      for (var o in a.attributes) i += " " + o + '="' + (a.attributes[o] || "").replace(/"/g, "&quot;") + '"';
+      return "<" + a.tag + ' class="' + a.classes.join(" ") + '"' + i + ">" + a.content + "</" + a.tag + ">";
+    }, !u.document) return u.addEventListener && (C.disableWorkerMessageHandler || u.addEventListener("message", function (e) {
+      var n = JSON.parse(e.data),
         t = n.language,
         r = n.code,
         a = n.immediateClose;
-    u.postMessage(C.highlight(r, C.languages[t], t)), a && u.close();
-  }, !1)), C;
-  var e = C.util.currentScript();
-
-  function t() {
-    C.manual || C.highlightAll();
-  }
-
-  if (e && (C.filename = e.src, e.hasAttribute("data-manual") && (C.manual = !0)), !C.manual) {
-    var r = document.readyState;
-    "loading" === r || "interactive" === r && e && e.defer ? document.addEventListener("DOMContentLoaded", t) : window.requestAnimationFrame ? window.requestAnimationFrame(t) : window.setTimeout(t, 16);
-  }
-
-  return C;
-}(_self);
-
+      u.postMessage(C.highlight(r, C.languages[t], t)), a && u.close();
+    }, !1)), C;
+    var e = C.util.currentScript();
+    function t() {
+      C.manual || C.highlightAll();
+    }
+    if (e && (C.filename = e.src, e.hasAttribute("data-manual") && (C.manual = !0)), !C.manual) {
+      var r = document.readyState;
+      "loading" === r || "interactive" === r && e && e.defer ? document.addEventListener("DOMContentLoaded", t) : window.requestAnimationFrame ? window.requestAnimationFrame(t) : window.setTimeout(t, 16);
+    }
+    return C;
+  }(_self);
 "undefined" != typeof module && module.exports && (module.exports = Prism), "undefined" != typeof global && (global.Prism = Prism);
 Prism.languages.markup = {
   comment: /<!--[\s\S]*?-->/,
@@ -691,7 +549,7 @@ Prism.languages.markup = {
 }, Prism.languages.markup.tag.inside["attr-value"].inside.entity = Prism.languages.markup.entity, Prism.languages.markup.doctype.inside["internal-subset"].inside = Prism.languages.markup, Prism.hooks.add("wrap", function (a) {
   "entity" === a.type && (a.attributes.title = a.content.replace(/&amp;/, "&"));
 }), Object.defineProperty(Prism.languages.markup.tag, "addInlined", {
-  value: function value(a, e) {
+  value: function (a, e) {
     var s = {};
     s["language-" + e] = {
       pattern: /(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,

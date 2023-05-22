@@ -66,7 +66,6 @@ pre {
   overflow: auto;
   max-width: 100%;
   margin-bottom: 1em;
-  width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
   max-width: 100%;
@@ -166,33 +165,26 @@ span[role=img][aria-label]:hover::after {
   body {
     overflow: hidden;
   }
-
   section {
     height: 100%;
     padding: 1em;
     position: absolute;
   }
-
   ul {
-    width: -webkit-max-content;
     width: -moz-max-content;
     width: max-content;
   }
-
   .o-content {
     max-height: 100vh;
   }
-
   .fragment {
     opacity: 0;
   }
-
   .l-double {
     display: grid;
     grid-template-columns: 50% 50%;
     align-items: center;
   }
-
   .o-controls {
     font-size: 75%;
     flex: none;
@@ -201,27 +193,22 @@ span[role=img][aria-label]:hover::after {
     width: 40vw;
     margin: 0 auto;
   }
-
   .start {
     display: block;
     z-index: 2;
   }
-
   [id^=slide]:target ~ #start {
     display: none;
   }
-
   [id^=slide] {
     transition: opacity 0.6s;
     opacity: 0;
     z-index: 0;
   }
-
   [id^=slide]:target {
     opacity: 1;
     z-index: 2;
   }
-
   [id^=slide]:target ~ .slide {
     opacity: 0;
     z-index: 0;
@@ -247,8 +234,7 @@ span[role=img][aria-label]:hover::after {
   top: 0.5em;
   right: 0.5em;
   color: forestgreen;
-  -ms-writing-mode: tb-rl;
-      writing-mode: vertical-rl;
+  writing-mode: vertical-rl;
   z-index: 2;
 }
 
@@ -277,7 +263,6 @@ pre[class*=language-] {
     -o-tab-size: 4;
        tab-size: 4;
   -webkit-hyphens: none;
-      -ms-hyphens: none;
           hyphens: none;
 }
 
